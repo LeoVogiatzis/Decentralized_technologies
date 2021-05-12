@@ -38,6 +38,7 @@ def main():
         [absolute_param, 'OP_CHECKLOCKTIMEVERIFY', 'OP_DROP', 'OP_DUP', 'OP_HASH160', p2pkh_addr.to_hash160(),
          'OP_EQUALVERIFY', 'OP_CHECKSIG'])
 
+
     # create a P2SH address from a redeem script
     addr = P2shAddress.from_script(redeem_script)
     print(addr.to_string())
