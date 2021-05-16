@@ -1,5 +1,5 @@
 from bitcoinutils.setup import setup
-from bitcoinutils.transactions import Transaction, TxInput, TxOutput, Locktime
+from bitcoinutils.transactions import Transaction, TxInput, TxOutput, Locktime, Sequence
 from bitcoinutils.keys import P2pkhAddress, P2shAddress, PrivateKey, PublicKey
 from bitcoinutils.script import Script
 from bitcoinutils.constants import TYPE_ABSOLUTE_TIMELOCK
@@ -25,7 +25,8 @@ def main():
     public_key = args.public_key
     absolute_param = args.time_loc
 
-    loc = Locktime(absolute_param)
+    seq = Sequence(TYPE_ABSOLUTE_TIMELOCK, absolute_param)
+    # loc = Locktime(absolute_param)
 
     # secret key corresponding to the pubkey needed for the P2SH (P2PKH) transaction
     p2pkh_sk = PublicKey(public_key)
@@ -35,7 +36,7 @@ def main():
 
     # create the redeem script
     redeem_script = Script(
-        [absolute_param, 'OP_CHECKLOCKTIMEVERIFY', 'OP_DROP', 'OP_DUP', 'OP_HASH160', p2pkh_addr.to_hash160(),
+        [seq.for_script(), 'OP_CHECKLOCKTIMEVERIFY', 'OP_DROP', 'OP_DUP', 'OP_HASH160', p2pkh_addr.to_hash160(),
          'OP_EQUALVERIFY', 'OP_CHECKSIG'])
 
 
