@@ -25,11 +25,11 @@ def main():
     public_key = args.public_key
     absolute_param = args.time
 
+    # check if time_lock exists
     if not absolute_param:
         print('error: You should add the time_lock')
         sys.exit(1)
-    else:
-        seq = Sequence(TYPE_ABSOLUTE_TIMELOCK, absolute_param)
+    seq = Sequence(TYPE_ABSOLUTE_TIMELOCK, absolute_param)
     lock = Locktime(absolute_param)
     # pubkey needed for the P2SH (P2PKH) transaction
     p2pkh_sk = PublicKey(public_key)
@@ -42,6 +42,7 @@ def main():
     # create a P2SH address from a redeem script
     addr = P2shAddress.from_script(redeem_script)
     print(addr.to_string())
+
 
 
 if __name__ == "__main__":
