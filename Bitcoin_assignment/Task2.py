@@ -15,31 +15,52 @@ def main():
     # setup regtest network
     setup('regtest')
     # parsing arguments
-    parser = argparse.ArgumentParser(description='Bitcoin Script for Task II')
-    parser.add_argument('-private_key', help='Insert a public key')
-    parser.add_argument('--time_loc', type=int,
-                        help='Insert a parameter (block height/Unix Epoch time that funds should be locked')
-    parser.add_argument('-p2sh', help='Insert a p2sh')
-    parser.add_argument('-p2pkh', help='Insert a p2pkh')
+    # parser = argparse.ArgumentParser(description='Bitcoin Script for Task II')
+    # parser.add_argument('-private_key', help='Insert a public key')
+    # parser.add_argument('--time_loc', type=int,
+    #                     help='Insert a parameter (block height/Unix Epoch time that funds should be locked')
+    # parser.add_argument('-p2sh', help='Insert a p2sh')
+    # parser.add_argument('-p2pkh', help='Insert a p2pkh')
+    # args = parser.parse_args()
+    #
+    # priv = args.private_key
+    # absolute_param = args.time_loc
+    # p2sh = args.time_loc
+    # p2pkh = args.p2pkh
+    #
 
-    print('Connect with your RPC credentials')
-    rpc_user = input('Enter rpc_username:')
-    rpcpassword = input('Enter rpc_password')
+    # print('Connect with your RPC credentials')
+    # rpc_user = input('Enter rpc_username:')
+    # rpcpassword = input('Enter rpc_password')
+
     # connect to NodeProxy with personal RPC credentials
-    proxy = NodeProxy(rpc_user, rpcpassword).get_proxy()
+    # proxy = NodeProxy(rpc_user, rpcpassword).get_proxy()
+    # list = proxy.listunspent(minconf, maxconf, "[\"addr\"]")
+
+    # calculate the amount of bitcoins to send
+    # btc_to_send = sum(map(lambda x: int(x['amount']), json.loads(list)))
+    # testing
+    proxy = NodeProxy('alice', 'DONT_USE_THIS_YOU_WILL_GET_ROBBED_8ak1gI25KFTvjovL3gAM967mies3E=').get_proxy()
     print(proxy.getblockcount())
+    # 'cVRDWtKS3J7ZUqAuECMWJc7RhQcRAwqvQWR1n6KetZck5o9tepTL'
     # the key that corresponds to the P2WPKH address
-    # priv = PrivateKey('cNho8fw3bPfLKT4jPzpANTsxTsP8aTdVBD6cXksBEXt4KhBN7uVk')
-    args = parser.parse_args()
-    priv = args.private_key
-    absolute_param = args.time_loc
-    p2sh = args.time_loc
-    p2pkh = args.p2pkh
-    # priv = PrivateKey('')
+    p2pkh_sk = PrivateKey('cPHoz48mhLh2sjtYtArwsvPVuxMkQWySJ9HVeTJsLbFEKbppkTvQ')
+    p2pkh_pk = p2pkh_sk.get_public_key()
+    p2pkh_addr = p2pkh_pk.get_address()
+    print(p2pkh_addr.to_string())
 
-    pub = priv.get_public_key()
+    seq = Sequence(TYPE_ABSOLUTE_TIMELOCK, 10)
+    redeem_script = Script(
+        [seq.for_script(), 'OP_CHECKLOCKTIMEVERIFY', 'OP_DROP', 'OP_DUP', 'OP_HASH160', p2pkh_addr.to_hash160(),
+         'OP_EQUALVERIFY', 'OP_CHECKSIG'])
 
-    # proxy.list_unspent(p2sh)
+    p2sh_addr = P2shAddress.from_script(redeem_script)
+    print(proxy.list_unspent(0, 9999999, p2sh_addr))
+
+    x=1
+
+    # End Testing
+    proxy.list_unspent(p2sh)
 
     seq = Sequence(TYPE_ABSOLUTE_TIMELOCK, absolute_param)
     # the p2sh script and the corresponding address
